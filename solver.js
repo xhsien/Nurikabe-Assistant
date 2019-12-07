@@ -47,6 +47,15 @@
   const di = [0, 0, -1, 1];
   const dj = [1, -1, 0, 0];
 
+  let taskSum = 0;
+  for (const [i, j] of BoardIterator()) {
+    if (task[i][j] > 0) {
+      taskSum += task[i][j];
+    }
+  }
+
+  const streamSize = size * size - taskSum;
+
   const IsValidCell = function(i, j) {
     return i >= 0 && i < size && j >= 0 && j < size;
   }
@@ -322,6 +331,10 @@
     let streams, islands;
     while (true) {
       [streams, islands] = GetStreamsAndIslands();
+
+      if (streams.length > 0 && streams[0].size == streamSize) {
+        break;
+      }
 
       let updates = [];
       updates = updates.concat(ComponentExit(streams));
