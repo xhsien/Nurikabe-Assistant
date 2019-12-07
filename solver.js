@@ -335,8 +335,6 @@
         break;
       }
 
-      console.log(updates);
-
       for (const [i, j, type] of updates) {
         board[i][j] = type;
       }
