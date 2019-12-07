@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+
+  "name"        : "Nurikabe Assistant",
+  "description" : "A tool to automate the boring stuffs when solving the Nurikabe puzzle.",  
+  "version"     : "1.0",
+
+  "content_scripts": [
+    {
+      "matches"   : ["https://www.puzzle-nurikabe.com/*"],
+      "js"        : ["js/contentscript.js"]
+    }
+  ],
+
+  "web_accessible_resources": ["js/assistant.js"]
+}
