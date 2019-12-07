@@ -153,14 +153,6 @@
   /* ===== strategies ===== */
   const [streams, islands] = GetStreamsAndIslands();
 
-  for (const island of islands) {
-    if (island.requiredSize == 1) {
-      for (const [ni, nj] of NeighborIterator(island.i, island.j)) {
-        board[ni][nj] = BLACK;
-      }
-    }
-  }
-
   const ComponentExit = function(components) {
     let updates = [];
     for (const component of components) {
@@ -226,7 +218,7 @@
         }
 
         for (const [ni, nj] of NeighborIterator(i, j)) {
-          if (visited[ni][nj] != id && TypeOf(ni, nj) == WHITE) {
+          if (visited[ni][nj] != id && TypeOf(ni, nj) != BLACK) {
             queue.push([ni, nj, dist - 1]);
           }
         }
@@ -288,16 +280,48 @@
         }
       }
     }
-    
+
     return updates;
   }
 
-  Game.drawCurrentState();
-  Game.storeCurrentState();
+  /* ===== Main ===== */
+  const ColorCell = function(i, j, color) {
+    const cell = boardCellsElement[Encode(i, j)];
 
-  boardElement.addEventListener("click", () => {
+    cell.style.backgroundColor = color;
+    cell.style.border = "1px solid " + color;
+  }
+
+  const ColorStreams = function(streams) {
+    const colors = ["#4aac8b",
+                    "#8b64d1",
+                    "#5cab47",
+                    "#be62b1",
+                    "#b9a432",
+                    "#6c8bcb",
+                    "#ce632f",
+                    "#c75980",
+                    "#98894c",
+                    "#cd5956"];
+
+    let idx = 0;
+    for (const stream of streams) {
+      if (stream.size < 5) {
+        continue;
+      }
+
+      const color = colors[idx++];
+      for (const [i, j] of stream.cells) {
+        ColorCell(i, j, color);
+      }
+    }
+  }
+
+
+  const ApplyStrategies = function() {
+    let streams, islands;
     while (true) {
-      const [streams, islands] = GetStreamsAndIslands();
+      [streams, islands] = GetStreamsAndIslands();
 
       let updates = [];
       updates = updates.concat(ComponentExit(streams));
@@ -311,12 +335,29 @@
         break;
       }
 
+      console.log(updates);
+
       for (const [i, j, type] of updates) {
         board[i][j] = type;
       }
-      
-      Game.drawCurrentState();
-      Game.storeCurrentState();
     }
+
+    Game.drawCurrentState();
+    ColorStreams(streams);
+    Game.storeCurrentState();
+  }
+
+  for (const island of islands) {
+    if (island.requiredSize == 1) {
+      for (const [ni, nj] of NeighborIterator(island.i, island.j)) {
+        board[ni][nj] = BLACK;
+      }
+    }
+  }
+
+  ApplyStrategies();
+
+  boardElement.addEventListener("click", () => {
+    ApplyStrategies();
   });
 }
